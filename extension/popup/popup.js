@@ -366,5 +366,16 @@ chrome.runtime.onMessage.addListener(msg => {
   updatePlaybackUI(state);
   // Wire retry button
   $('btn-retry-connect').addEventListener('click', () => checkServer());
+  // Wire copy install command button
+  $('btn-copy-install').addEventListener('click', () => {
+    const cmd = 'curl -fsSL https://raw.githubusercontent.com/Vishwas3000/Readout_loud/main/install.sh | bash';
+    navigator.clipboard.writeText(cmd).then(() => {
+      const btn = $('btn-copy-install');
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copied!';
+      btn.style.color = '#34d399';
+      setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+    });
+  });
   checkServer();
 })();
