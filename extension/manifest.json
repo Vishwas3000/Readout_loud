@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "Kokoro Reader",
+  "version": "1.0.0",
+  "description": "Local AI text-to-speech using Kokoro-82M. Read any webpage or research paper with a natural voice — 100% private, no cloud.",
+
+  "permissions": [
+    "storage",
+    "offscreen",
+    "activeTab",
+    "scripting",
+    "contextMenus"
+  ],
+
+  "host_permissions": [
+    "http://localhost:8880/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Kokoro Reader",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; connect-src http://localhost:8880"
+  }
+}

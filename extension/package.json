@@ -1,0 +1,13 @@
+{
+  "name": "kokoro-reader-extension",
+  "version": "1.0.0",
+  "description": "Chrome extension for Kokoro TTS",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i src/input.css -o popup/popup.css --minify",
+    "watch:css": "tailwindcss -i src/input.css -o popup/popup.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}

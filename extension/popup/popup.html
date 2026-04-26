@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kokoro Reader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body class="w-[340px] min-h-[500px] bg-slate-950 text-slate-100 font-sans antialiased select-none overflow-hidden flex flex-col">
+
+  <!-- ── Ambient Orbs ─────────────────────────────────────── -->
+  <div class="fixed inset-0 pointer-events-none" aria-hidden="true">
+    <div class="absolute -top-20 -right-20 w-56 h-56 bg-indigo-600/10 rounded-full blur-[60px]"></div>
+    <div class="absolute -bottom-20 -left-20 w-48 h-48 bg-cyan-500/8 rounded-full blur-[60px]"></div>
+  </div>
+
+  <!-- ── Header ────────────────────────────────────────────── -->
+  <header class="relative flex items-center justify-between px-4 py-3 border-b border-slate-800/60 bg-slate-900/50 backdrop-blur-sm shrink-0">
+    <div class="flex items-center gap-3">
+      <!-- Logo icon -->
+      <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30"
+           style="background: linear-gradient(135deg, #6366f1, #06b6d4)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+          <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+          <line x1="8" y1="22" x2="16" y2="22"/>
+        </svg>
+      </div>
+      <!-- Brand text -->
+      <div class="leading-none">
+        <div class="text-[14px] font-bold text-gradient tracking-tight">Kokoro Reader</div>
+        <div id="device-info" class="text-[10px] text-slate-500 font-medium mt-0.5">Kokoro-82M · Local</div>
+      </div>
+    </div>
+    <!-- Status dot -->
+    <div class="flex items-center gap-2">
+      <div id="server-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-500 ring-2 ring-slate-950"></div>
+    </div>
+  </header>
+
+  <!-- ── Server Banner ──────────────────────────────────────── -->
+  <div id="server-banner" class="banner-checking flex items-center gap-2 px-4 py-1.5 text-[11px] font-semibold shrink-0 transition-all duration-300">
+    <div id="banner-dot" class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0"></div>
+    <span id="server-banner-text">Checking server…</span>
+    <span id="banner-device" class="ml-auto text-[10px] opacity-60 font-normal hidden"></span>
+  </div>
+
+  <!-- ── Player Card ────────────────────────────────────────── -->
+  <div class="relative mx-3 mt-3 rounded-2xl border border-slate-800/60 overflow-hidden grad-border shrink-0"
+       style="background: linear-gradient(145deg, rgb(15 23 42 / 0.9), rgb(15 23 42 / 0.5))">
+
+    <!-- Glow overlay when playing -->
+    <div id="player-glow" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-700"
+         style="background: linear-gradient(145deg, rgba(99,102,241,0.06), rgba(6,182,212,0.04))"></div>
+
+    <div class="relative p-4">
+      <!-- Waveform row -->
+      <div class="flex items-end gap-1 mb-4">
+        <!-- 7 animated bars -->
+        <div class="flex items-end gap-[3px] h-7">
+          <div class="wave-bar w-1 rounded-full bg-gradient-to-t from-indigo-500 to-cyan-400 opacity-20 transition-all duration-300" style="height:4px; --wave-dur:0.65s"></div>
+          <div class="wave-bar w-1 rounded-full bg-gradient-to-t from-indigo-500 to-cyan-400 opacity-20 transition-all duration-300" style="height:4px; --wave-dur:0.80s; animation-delay:0.08s"></div>
+          <div class="wave-bar w-1 rounded-full bg-gradient-to-t from-indigo-500 to-cyan-400 opacity-20 transition-all duration-300" style="height:4px; --wave-dur:0.72s; animation-delay:0.16s"></div>
+          <div class="wave-bar w-1 rounded-full bg-gradient-to-t from-indigo-500 to-cyan-400 opacity-20 transition-all duration-300" style="height:4px; --wave-dur:0.90s; animation-delay:0.04s"></div>
+          <div class="wave-bar w-1 rounded-full bg-gradient-to-t from-indigo-500 to-cyan-400 opacity-20 transition-all duration-300" style="height:4px; --wave-dur:0.78s; animation-delay:0.20s"></div>
+          <div class="wave-bar w-1 rounded-full bg-gradient-to-t from-indigo-500 to-cyan-400 opacity-20 transition-all duration-300" style="height:4px; --wave-dur:0.68s; animation-delay:0.12s"></div>
+          <div class="wave-bar w-1 rounded-full bg-gradient-to-t from-indigo-500 to-cyan-400 opacity-20 transition-all duration-300" style="height:4px; --wave-dur:0.85s; animation-delay:0.24s"></div>
+        </div>
+
+        <!-- Status text -->
+        <div class="flex-1 text-right min-w-0 pl-2">
+          <div id="playback-label" class="text-xs text-slate-500 font-medium truncate">Not playing</div>
+          <div id="chunk-progress" class="text-[10px] text-slate-600 mt-0.5 tabular-nums hidden">—</div>
+        </div>
+      </div>
+
+      <!-- Control row -->
+      <div class="flex gap-2">
+        <button id="btn-stop"
+          class="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/60 hover:border-slate-600 text-slate-400 hover:text-slate-200 text-xs font-semibold transition-all duration-150 active:scale-95 shrink-0">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="5" y="5" width="14" height="14" rx="2"/>
+          </svg>
+          Stop
+        </button>
+        <button id="btn-pause"
+          class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-white text-xs font-bold transition-all duration-150 active:scale-95 glow-indigo"
+          style="background: linear-gradient(135deg, #6366f1, #06b6d4)">
+          <svg id="pause-icon" width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+          </svg>
+          <span id="pause-label">Pause</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Read Actions ───────────────────────────────────────── -->
+  <div class="flex gap-2 px-3 mt-2.5 shrink-0">
+    <!-- Primary: Read Selection -->
+    <button id="btn-read-selection"
+      class="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 active:scale-95 border"
+      style="background: rgba(99,102,241,0.13); border-color: rgba(99,102,241,0.3); color: #a5b4fc">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      Read Selected
+    </button>
+    <!-- Secondary: Read Page -->
+    <button id="btn-read-page"
+      class="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/50 hover:border-slate-600 text-slate-400 hover:text-slate-200 text-xs font-semibold transition-all duration-150 active:scale-95">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      Full Page
+    </button>
+  </div>
+
+  <!-- ── Tab Selector ──────────────────────────────────────── -->
+  <div class="flex items-center gap-0 px-3 mt-4 shrink-0">
+    <div class="flex bg-slate-900/80 rounded-xl p-1 gap-0.5 border border-slate-800/60 w-full">
+      <button class="tab-btn is-active flex-1 text-[11.5px] font-semibold py-1.5 px-2 rounded-lg transition-all duration-200 text-slate-200" data-tab="voice" id="tab-voice">Voice</button>
+      <button class="tab-btn flex-1 text-[11.5px] font-semibold py-1.5 px-2 rounded-lg transition-all duration-200 text-slate-500 hover:text-slate-400" data-tab="speed" id="tab-speed">Speed</button>
+      <button class="tab-btn flex-1 text-[11.5px] font-semibold py-1.5 px-2 rounded-lg transition-all duration-200 text-slate-500 hover:text-slate-400" data-tab="settings" id="tab-settings">Settings</button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- ── Voice Panel ──────────────────────────────────────── -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div id="panel-voice" class="px-3 pt-3 pb-4 flex flex-col gap-3 flex-1">
+    <!-- Select -->
+    <div>
+      <label class="block text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500 mb-1.5">Voice</label>
+      <div class="relative">
+        <select id="voice-select"
+          class="w-full appearance-none bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-[12.5px] font-medium rounded-xl px-3 py-2.5 pr-9 outline-none focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/15 transition-all cursor-pointer">
+          <optgroup label="🇮🇳 Indian English — Female">
+            <option value="hf_alpha">hf_alpha — Clear Indian Accent</option>
+            <option value="hf_beta">hf_beta — Warm Indian Accent</option>
+          </optgroup>
+          <optgroup label="🇮🇳 Indian English — Male">
+            <option value="hm_omega">hm_omega — Deep Indian Accent</option>
+            <option value="hm_psi">hm_psi — Natural Indian Accent</option>
+          </optgroup>
+          <optgroup label="🇺🇸 American — Female">
+            <option value="af_heart">af_heart — Warm &amp; Natural ⭐</option>
+            <option value="af_bella">af_bella — Clear &amp; Professional</option>
+            <option value="af_sarah">af_sarah — Friendly &amp; Energetic</option>
+            <option value="af_nicole">af_nicole — Soft &amp; Calm</option>
+            <option value="af_sky">af_sky — Upbeat &amp; Bright</option>
+            <option value="af_jessica">af_jessica — Expressive &amp; Vivid</option>
+            <option value="af_river">af_river — Smooth &amp; Flowing</option>
+          </optgroup>
+          <optgroup label="🇺🇸 American — Male">
+            <option value="am_adam">am_adam — Authority &amp; Deep</option>
+            <option value="am_michael">am_michael — Natural &amp; Relaxed</option>
+            <option value="am_echo">am_echo — Clear &amp; Neutral</option>
+            <option value="am_eric">am_eric — Warm &amp; Conversational</option>
+            <option value="am_liam">am_liam — Youthful &amp; Energetic</option>
+            <option value="am_onyx">am_onyx — Rich Baritone</option>
+            <option value="am_orion">am_orion — Commanding &amp; Clear</option>
+          </optgroup>
+          <optgroup label="🇬🇧 British — Female">
+            <option value="bf_emma">bf_emma — Formal &amp; Crisp</option>
+            <option value="bf_alice">bf_alice — Elegant &amp; Refined</option>
+            <option value="bf_isabella">bf_isabella — Warm &amp; Storytelling</option>
+            <option value="bf_lily">bf_lily — Soft &amp; Gentle</option>
+          </optgroup>
+          <optgroup label="🇬🇧 British — Male">
+            <option value="bm_george">bm_george — Classic &amp; Measured</option>
+            <option value="bm_daniel">bm_daniel — Authoritative &amp; Clear</option>
+            <option value="bm_fable">bm_fable — Narrative &amp; Engaging</option>
+            <option value="bm_lewis">bm_lewis — Conversational</option>
+          </optgroup>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-500">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voice info chip -->
+    <div id="voice-info-card"
+      class="flex items-center gap-3 p-3 rounded-xl border transition-all duration-300"
+      style="background: rgba(99,102,241,0.07); border-color: rgba(99,102,241,0.2)">
+      <div id="voice-avatar"
+        class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
+        style="background: linear-gradient(135deg, #6366f1, #06b6d4)">
+        ♀
+      </div>
+      <div class="min-w-0">
+        <div id="voice-accent" class="text-[11.5px] font-semibold text-indigo-300">American English</div>
+        <div id="voice-style" class="text-[10.5px] text-slate-500 mt-0.5 truncate">Warm &amp; Natural — Best for papers</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- ── Speed Panel ──────────────────────────────────────── -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div id="panel-speed" class="hidden px-3 pt-3 pb-4 flex flex-col gap-4 flex-1">
+    <!-- Speed display -->
+    <div class="flex items-center justify-between">
+      <label class="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500">Playback Speed</label>
+      <div class="flex items-baseline gap-0.5">
+        <span id="speed-display" class="text-2xl font-bold text-gradient tabular-nums">1.00</span>
+        <span class="text-sm text-slate-500 font-semibold">×</span>
+      </div>
+    </div>
+
+    <!-- Slider -->
+    <input type="range" id="speed-slider" min="0.5" max="2.0" step="0.05" value="1.0" class="w-full">
+    <div class="flex justify-between -mt-2">
+      <span class="text-[10px] text-slate-600">Slow 0.5×</span>
+      <span class="text-[10px] text-slate-600">Fast 2.0×</span>
+    </div>
+
+    <!-- Presets -->
+    <div>
+      <label class="block text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500 mb-2">Quick Preset</label>
+      <div class="grid grid-cols-4 gap-1.5">
+        <button class="speed-preset py-2.5 rounded-xl text-xs font-bold border border-slate-700/60 bg-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-700 transition-all active:scale-95" data-speed="0.8">0.8×</button>
+        <button class="speed-preset is-active py-2.5 rounded-xl text-xs font-bold border transition-all active:scale-95" data-speed="1.0">1×</button>
+        <button class="speed-preset py-2.5 rounded-xl text-xs font-bold border border-slate-700/60 bg-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-700 transition-all active:scale-95" data-speed="1.25">1.25×</button>
+        <button class="speed-preset py-2.5 rounded-xl text-xs font-bold border border-slate-700/60 bg-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-700 transition-all active:scale-95" data-speed="1.5">1.5×</button>
+      </div>
+    </div>
+
+    <!-- Context tip -->
+    <div class="flex items-start gap-2 p-3 rounded-xl border border-cyan-500/15 text-[10.5px] text-slate-500 leading-relaxed" style="background: rgba(6,182,212,0.05)">
+      <svg class="text-cyan-500/60 mt-0.5 shrink-0" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span><strong class="text-slate-400">Tip:</strong> Use 0.9× for dense math sections, 1.2–1.5× for related work and introductions.</span>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- ── Settings Panel ───────────────────────────────────── -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div id="panel-settings" class="hidden px-3 pt-3 pb-4 flex flex-col gap-3 flex-1">
+    <!-- Server URL -->
+    <div>
+      <label class="block text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500 mb-1.5">Server URL</label>
+      <div class="flex gap-2">
+        <input type="text" id="server-url" value="http://localhost:8880"
+          class="flex-1 bg-slate-900 border border-slate-800 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/10 text-slate-200 text-xs rounded-xl px-3 py-2.5 outline-none transition-all font-mono placeholder:text-slate-600">
+        <button id="btn-check-server"
+          class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-300 text-xs font-bold rounded-xl transition-all active:scale-95 whitespace-nowrap">
+          Test
+        </button>
+      </div>
+    </div>
+
+    <!-- Audio Format -->
+    <div>
+      <label class="block text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500 mb-1.5">Audio Format</label>
+      <div class="relative">
+        <select id="format-select"
+          class="w-full appearance-none bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2.5 pr-9 outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/10 transition-all cursor-pointer">
+          <option value="wav">WAV — Best quality (recommended)</option>
+          <option value="mp3">MP3 — Smaller file size</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-500">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chunk Size + Citations toggle row -->
+    <div class="grid grid-cols-2 gap-2">
+      <!-- Chunk size -->
+      <div>
+        <label class="block text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500 mb-1.5">Chunk Size</label>
+        <div class="flex items-center bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 gap-1.5">
+          <input type="number" id="chunk-size" value="2000" min="500" max="5000" step="100"
+            class="w-full bg-transparent text-slate-200 text-xs font-mono outline-none">
+          <span class="text-[10px] text-slate-600 shrink-0">chars</span>
+        </div>
+      </div>
+      <!-- Citations toggle -->
+      <div class="flex flex-col justify-between">
+        <label class="block text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500 mb-1.5">Clean Citations</label>
+        <div class="flex items-center gap-2 py-2.5">
+          <label class="relative cursor-pointer flex items-center">
+            <input type="checkbox" id="clean-citations" class="sr-only" checked>
+            <div class="toggle-track"></div>
+          </label>
+          <span id="citations-label" class="text-[11px] text-slate-400 font-medium">On</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save -->
+    <button id="btn-save-settings"
+      class="w-full py-2.5 rounded-xl text-white text-[12.5px] font-bold transition-all duration-150 active:scale-[0.98] shadow-lg mt-1"
+      style="background: linear-gradient(135deg, #6366f1, #06b6d4); box-shadow: 0 4px 20px rgba(99,102,241,0.3)">
+      Save Settings
+    </button>
+  </div>
+
+  <!-- ── Footer ─────────────────────────────────────────────── -->
+  <footer class="shrink-0 flex items-center justify-between px-4 py-2.5 border-t border-slate-800/60 bg-slate-900/40 mt-auto">
+    <div class="flex items-center gap-1.5">
+      <div class="w-1.5 h-1.5 rounded-full bg-indigo-400/60"></div>
+      <span class="text-[10px] text-slate-600 font-medium">v1.0.0 · kokoro 0.7.x</span>
+    </div>
+    <a id="api-docs-link" href="http://localhost:8880/docs" target="_blank"
+      class="text-[10px] text-cyan-400/50 hover:text-cyan-300 font-semibold transition-colors">
+      API Docs ↗
+    </a>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

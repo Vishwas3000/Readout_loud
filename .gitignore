@@ -1,0 +1,75 @@
+# ─── Python ────────────────────────────────────────────────────────────────────
+server/.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+.Python
+
+# ─── Virtual environments ───────────────────────────────────────────────────────
+env/
+venv/
+.env
+.venv
+
+# ─── Node / Tailwind build ──────────────────────────────────────────────────────
+node_modules/
+extension/node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ─── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# ─── Model cache (large files) ─────────────────────────────────────────────────
+# HuggingFace downloads land in ~/.cache — but guard against accidental copies
+*.pth
+*.onnx
+*.bin
+*.safetensors
+kokoro-v1_0.pth
+
+# ─── Audio temp files ───────────────────────────────────────────────────────────
+*.wav
+*.mp3
+*.ogg
+/tmp/
+
+# ─── IDE / Editor ───────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursorrules
+
+# ─── Logs ───────────────────────────────────────────────────────────────────────
+*.log
+logs/
+server/logs/
+
+# ─── Secrets / environment ──────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+secrets/
+*.key
+
+# ─── Compiled Tailwind — keep in git so extension works without build step ──────
+# (popup.css IS committed — it's the compiled output that Chrome loads)
+# extension/popup/popup.css   ← intentionally NOT ignored
+
+# ─── Tailwind source (only needed to rebuild CSS, not for runtime) ───────────────
+# extension/src/              ← keep in git so devs can rebuild
