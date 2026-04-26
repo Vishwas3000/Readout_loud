@@ -28,10 +28,15 @@ yarn-error.log*
 .DS_Store
 .AppleDouble
 .LSOverride
-Icon?
+# macOS folder icon file (literally named "Icon" + carriage return — NOT icon*.png)
+Icon
 ._*
 .Spotlight-V100
 .Trashes
+
+# ─── Extension icons — must NOT be ignored ──────────────────────────────────────
+!extension/icons/
+!extension/icons/*.png
 
 # ─── Model cache (large files) ─────────────────────────────────────────────────
 # HuggingFace downloads land in ~/.cache — but guard against accidental copies

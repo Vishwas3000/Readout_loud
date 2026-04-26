@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Kokoro Reader</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #cbd5e1;
+      min-height: 100vh;
+      padding: 48px 24px;
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; }
+    .subtitle { color: #64748b; font-size: 0.9rem; margin-bottom: 48px; }
+    h2 { font-size: 1.1rem; font-weight: 600; color: #e2e8f0; margin: 32px 0 12px; }
+    p  { line-height: 1.7; color: #94a3b8; margin-bottom: 12px; }
+    ul { padding-left: 20px; margin-bottom: 12px; }
+    li { line-height: 1.7; color: #94a3b8; margin-bottom: 4px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
+      color: #34d399; font-size: 0.8rem; font-weight: 600;
+      padding: 6px 14px; border-radius: 999px; margin-bottom: 32px;
+    }
+    .badge::before { content: '●'; font-size: 0.5rem; }
+    a { color: #818cf8; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid #1e293b;
+             color: #475569; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Privacy Policy</h1>
+    <p class="subtitle">Kokoro Reader Chrome Extension · Last updated: April 2025</p>
+
+    <div class="badge">100% Local — No Data Leaves Your Device</div>
+
+    <h2>Overview</h2>
+    <p>
+      Kokoro Reader is a text-to-speech Chrome extension that converts webpage text to audio
+      using the <strong>Kokoro-82M</strong> AI model running entirely on your local machine.
+      No audio, text, or personal data is ever sent to any external server or third party.
+    </p>
+
+    <h2>Data We Collect</h2>
+    <p>We collect <strong>no data whatsoever</strong>. Specifically:</p>
+    <ul>
+      <li>We do <strong>not</strong> collect browsing history or page content</li>
+      <li>We do <strong>not</strong> transmit the text you select to any remote server</li>
+      <li>We do <strong>not</strong> store audio recordings</li>
+      <li>We do <strong>not</strong> use analytics, telemetry, or crash reporting services</li>
+      <li>We do <strong>not</strong> use cookies or tracking pixels</li>
+    </ul>
+
+    <h2>How It Works (Locally)</h2>
+    <p>
+      When you select text and click "Read", the extension sends that text exclusively to
+      a local Python server running on <code>localhost:8880</code> on your own computer.
+      The Kokoro-82M model processes the text entirely on your hardware (CPU, GPU, or Apple Silicon MPS)
+      and returns audio that is played directly in your browser. Nothing leaves your machine.
+    </p>
+
+    <h2>Permissions</h2>
+    <p>The extension requests the following Chrome permissions:</p>
+    <ul>
+      <li><strong>storage</strong> — saves your voice/speed preferences locally in Chrome's sync storage</li>
+      <li><strong>activeTab</strong> — reads selected text from the current tab when you initiate reading</li>
+      <li><strong>scripting</strong> — injects a minimal content script to detect text selection and show the read button</li>
+      <li><strong>contextMenus</strong> — adds a right-click "Read with Kokoro" option</li>
+      <li><strong>offscreen</strong> — plays audio in a background document (Chrome MV3 requirement)</li>
+      <li><strong>localhost:8880</strong> — communicates with the local Kokoro TTS server on your machine only</li>
+    </ul>
+
+    <h2>Third-Party Services</h2>
+    <p>
+      This extension does not integrate with any third-party service. The Kokoro-82M model weights
+      are downloaded once from <a href="https://huggingface.co/hexgrad/Kokoro-82M" target="_blank">Hugging Face</a>
+      during initial server setup — this is a one-time download to your local machine and is not
+      required for ongoing use.
+    </p>
+
+    <h2>Data Storage</h2>
+    <p>
+      Your preferences (selected voice, playback speed, server URL) are stored using
+      Chrome's built-in <code>chrome.storage.sync</code> API — saved to your Chrome profile
+      and synced across your own devices only. No preference data is sent to us.
+    </p>
+
+    <h2>Changes to This Policy</h2>
+    <p>
+      If we make changes to this privacy policy, we will update the "Last updated" date above.
+      Since no data is collected, changes will only occur if new features are added that affect
+      data handling — and we will always err on the side of more privacy, not less.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions? Open an issue on
+      <a href="https://github.com/Vishwas3000/Readout_loud" target="_blank">GitHub</a>.
+    </p>
+
+    <footer>
+      © 2025 Kokoro Reader · Open source · MIT License ·
+      <a href="https://github.com/Vishwas3000/Readout_loud">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>
