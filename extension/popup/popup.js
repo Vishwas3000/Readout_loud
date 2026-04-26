@@ -134,6 +134,41 @@ function updateCitationsLabel() {
 }
 
 // ── Server health ──────────────────────────────────────────────────────────────
+const MAIN_CONTENT_IDS = ['player-card-wrap', 'read-actions-wrap', 'tab-bar-wrap', 'panel-voice', 'panel-speed', 'panel-settings'];
+
+function showSetupOverlay(show) {
+  const overlay = $('setup-overlay');
+  // The overlay replaces the main content area
+  if (show) {
+    overlay.classList.remove('hidden');
+    overlay.classList.add('flex');
+    // Hide the main panels
+    ['btn-read-selection','btn-read-page','btn-stop','btn-pause'].forEach(id => {
+      const el = $(id); if (el) el.closest('div')?.classList.add('opacity-30', 'pointer-events-none');
+    });
+    // Dim the player card area
+    const playerArea = document.querySelector('.relative.mx-3.mt-3');
+    if (playerArea) playerArea.classList.add('opacity-30', 'pointer-events-none');
+    const tabBar = document.querySelector('.flex.items-center.gap-0.px-3.mt-4');
+    if (tabBar) tabBar.classList.add('opacity-30', 'pointer-events-none');
+    const readActions = document.querySelector('.flex.gap-2.px-3.mt-2\\.5');
+    if (readActions) readActions.classList.add('opacity-30', 'pointer-events-none');
+    ['panel-voice','panel-speed','panel-settings'].forEach(id => {
+      const el = $(id); if (el) el.classList.add('hidden');
+    });
+  } else {
+    overlay.classList.add('hidden');
+    overlay.classList.remove('flex');
+    // Restore main panels
+    const playerArea = document.querySelector('.relative.mx-3.mt-3');
+    if (playerArea) playerArea.classList.remove('opacity-30', 'pointer-events-none');
+    const tabBar = document.querySelector('.flex.items-center.gap-0.px-3.mt-4');
+    if (tabBar) tabBar.classList.remove('opacity-30', 'pointer-events-none');
+    const readActions = document.querySelector('.flex.gap-2.px-3.mt-2\\.5');
+    if (readActions) readActions.classList.remove('opacity-30', 'pointer-events-none');
+  }
+}
+
 async function checkServer(url) {
   setBanner('checking', 'Checking server…');
   els.serverDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 transition-all duration-500 ring-2 ring-slate-950 dot-checking';
@@ -150,9 +185,13 @@ async function checkServer(url) {
     els.serverDot.className = 'w-2.5 h-2.5 rounded-full transition-all duration-500 ring-2 ring-slate-950 dot-ok';
     els.deviceInfo.textContent = `Kokoro-82M · ${deviceLabel}`;
     els.bannerDevice.textContent = `${result.model_loaded ? '' : '⚠ model loading'}`;
+    showSetupOverlay(false);
+    // Restore active tab
+    activateTab(document.querySelector('.tab-btn.is-active')?.dataset.tab || 'voice');
   } else {
     setBanner('error', result.error || 'Server unreachable — run ./start_server.sh');
     els.serverDot.className = 'w-2.5 h-2.5 rounded-full transition-all duration-500 ring-2 ring-slate-950 dot-error';
+    showSetupOverlay(true);
   }
 }
 
@@ -325,5 +364,7 @@ chrome.runtime.onMessage.addListener(msg => {
   await loadSettings();
   const state = await chrome.runtime.sendMessage({ action: 'get-state' });
   updatePlaybackUI(state);
+  // Wire retry button
+  $('btn-retry-connect').addEventListener('click', () => checkServer());
   checkServer();
 })();
